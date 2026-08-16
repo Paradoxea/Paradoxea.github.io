@@ -36,7 +36,7 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1400px;
       width: 100%;
     }
 
@@ -105,6 +105,7 @@
       flex-wrap: wrap;
       gap: 1.5rem;
       margin-bottom: 3rem;
+      justify-content: center;
     }
 
     .video-card {
@@ -112,8 +113,8 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       overflow: hidden;
-      flex: 1 1 calc(50% - 0.75rem);
-      min-width: 300px;
+      flex: 0 0 calc(33.3333% - 1rem);
+      min-width: 250px;
       cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease;
       display: flex;
@@ -381,6 +382,19 @@
           <div class="card-title">Cash grab games development experience</div>
           <div class="card-desc">The game was developed very quickly and was polished to perfection in a week. It was intended as a cash grab game, but it never gained popularity. Interestingly, it was my first experience with a leaderboard.</div>
           <span class="badge legacy">Legacy / Small cash grab game</span>
+        </div>
+      </div>
+    </div>
+
+      <!-- Video 5 (Old project) -->
+      <div class="video-card" onclick="openModal('https://files.catbox.moe/fm6aeq.mp4')">
+        <div class="thumbnail-wrapper">
+          <video src="https://files.catbox.moe/fm6aeq.mp4#t=0.1" preload="metadata" muted></video>
+        </div>
+        <div class="card-content">
+          <div class="card-title">First Tycoon development expirience</div>
+          <div class="card-desc">One of my very first projects, it has bugs but is still a working tycoon, abandoned forever.</div>
+          <span class="badge legacy">Legacy / Abandoned project</span>
         </div>
       </div>
     </div>
