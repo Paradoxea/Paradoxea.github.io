@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paradoxea | Roblox Middle Indie Gamedev</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+  <link href="[https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap)" rel="stylesheet">
   
   <style>
     :root {
@@ -114,7 +114,7 @@
       border-radius: 12px;
       overflow: hidden;
       flex: 0 0 calc(33.3333% - 1rem);
-      min-width: 250px;
+      min-width: 280px;
       cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease;
       display: flex;
@@ -215,7 +215,7 @@
       color: #ffffff;
     }
 
-    /* Modal Player */
+    
     .modal {
       display: none;
       position: fixed;
@@ -223,13 +223,14 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8); 
       backdrop-filter: blur(12px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
       opacity: 0;
       transition: opacity 0.3s ease;
+      padding: 20px; 
     }
 
     .modal.active {
@@ -237,17 +238,22 @@
       opacity: 1;
     }
 
+    
     .modal-content {
-      width: 80vw;
-      height: 90vh;
-      background: #000;
+      background: #000; 
       border: 1px solid var(--border-color);
       border-radius: 20px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.9);
       transform: scale(0.9);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      
+      display: flex;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .modal.active .modal-content {
@@ -255,8 +261,11 @@
     }
 
     .modal-content video {
-      width: 100%;
-      height: 100%;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
       object-fit: contain;
     }
 
@@ -264,9 +273,9 @@
       position: absolute;
       top: 15px;
       right: 20px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       font-size: 1.5rem;
       width: 40px;
       height: 40px;
@@ -276,14 +285,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
     .close-btn:hover {
       background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
     }
 
-    /* Footer */
+    /* --- Footer --- */
     footer {
       text-align: center;
       padding-top: 1.5rem;
@@ -310,12 +320,25 @@
       color: var(--purple);
     }
 
+    @media (max-width: 900px) {
+      .video-card {
+        flex: 0 0 calc(50% - 0.75rem);
+      }
+    }
+
     @media (max-width: 640px) {
       .video-card {
         flex: 1 1 100%;
       }
       h1 {
         font-size: 2.2rem;
+      }
+      .close-btn {
+        top: 10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
       }
     }
   </style>
@@ -338,9 +361,9 @@
 
     <div class="video-grid">
       <!-- Video 1 -->
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/j62tvg.mp4')">
+      <div class="video-card" onclick="openModal('[https://files.catbox.moe/j62tvg.mp4](https://files.catbox.moe/j62tvg.mp4)')">
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/j62tvg.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="[https://files.catbox.moe/j62tvg.mp4#t=0.1](https://files.catbox.moe/j62tvg.mp4#t=0.1)" preload="metadata" muted></video>
         </div>
         <div class="card-content">
           <div class="card-title">Round & Hitbox Systems</div>
@@ -350,9 +373,9 @@
       </div>
 
       <!-- Video 2 -->
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/ht6v6w.mp4')">
+      <div class="video-card" onclick="openModal('[https://files.catbox.moe/ht6v6w.mp4](https://files.catbox.moe/ht6v6w.mp4)')">
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/ht6v6w.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="[https://files.catbox.moe/ht6v6w.mp4#t=0.1](https://files.catbox.moe/ht6v6w.mp4#t=0.1)" preload="metadata" muted></video>
         </div>
         <div class="card-content">
           <div class="card-title">Inventory system & Admin panel</div>
@@ -362,9 +385,9 @@
       </div>
 
       <!-- Video 3 (Old project) -->
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/7noo9t.mp4')">
+      <div class="video-card" onclick="openModal('[https://files.catbox.moe/7noo9t.mp4](https://files.catbox.moe/7noo9t.mp4)')">
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/7noo9t.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="[https://files.catbox.moe/7noo9t.mp4#t=0.1](https://files.catbox.moe/7noo9t.mp4#t=0.1)" preload="metadata" muted></video>
         </div>
         <div class="card-content">
           <div class="card-title">Incremental game mechanics</div>
@@ -374,9 +397,9 @@
       </div>
 
       <!-- Video 4 (Old project) -->
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/l9ozic.mp4')">
+      <div class="video-card" onclick="openModal('[https://files.catbox.moe/l9ozic.mp4](https://files.catbox.moe/l9ozic.mp4)')">
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/l9ozic.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="[https://files.catbox.moe/l9ozic.mp4#t=0.1](https://files.catbox.moe/l9ozic.mp4#t=0.1)" preload="metadata" muted></video>
         </div>
         <div class="card-content">
           <div class="card-title">Cash grab games development experience</div>
@@ -386,9 +409,9 @@
       </div>
 
       <!-- Video 5 (Old project) -->
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/fm6aeq.mp4')">
+      <div class="video-card" onclick="openModal('[https://files.catbox.moe/fm6aeq.mp4](https://files.catbox.moe/fm6aeq.mp4)')">
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/fm6aeq.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="[https://files.catbox.moe/fm6aeq.mp4#t=0.1](https://files.catbox.moe/fm6aeq.mp4#t=0.1)" preload="metadata" muted></video>
         </div>
         <div class="card-content">
           <div class="card-title">First Tycoon development expirience</div>
@@ -409,8 +432,8 @@
 
     <footer>
       <div class="social-links">
-        <a href="https://discord.com/users/613829528296357901" target="_blank">Discord</a>
-        <a href="https://www.roblox.com/users/1031928753/profile" target="_blank">Roblox Profile</a>
+        <a href="[https://discord.com/users/613829528296357901](https://discord.com/users/613829528296357901)" target="_blank">Discord</a>
+        <a href="[https://www.roblox.com/users/1031928753/profile](https://www.roblox.com/users/1031928753/profile)" target="_blank">Roblox Profile</a>
       </div>
       <p>© 2026 Most likely all rights reserved.</p>
     </footer>
