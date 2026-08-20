@@ -4,19 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paradoxea | Roblox Middle Indie Gamedev</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-color: #0d0e12;
-      --card-bg: #151821;
-      --accent: #c1ebe9;
-      --purple: #8a5cf6;
+      --bg-dark: #07050a;
+      --card-bg: rgba(14, 10, 22, 0.28);
+      --card-border: rgba(157, 78, 221, 0.18);
+      --card-border-hover: rgba(168, 85, 247, 0.6);
+      
+      --amethyst: #9d4edd;
+      --amethyst-bright: #c084fc;
+      --amethyst-glow: rgba(157, 78, 221, 0.35);
+      --amethyst-subtle: rgba(157, 78, 221, 0.12);
+      
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --border-color: rgba(193, 235, 233, 0.15);
+      --text-dim: #6b7280;
     }
 
     * {
@@ -25,54 +32,147 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       line-height: 1.6;
-      padding: 2rem 1rem;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+      padding: 3rem 1.5rem;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1280px;
       width: 100%;
+      z-index: 1;
     }
 
-    /* Header */
     header {
-      margin-bottom: 2.5rem;
-      text-align: left;
+      margin-bottom: 3.5rem;
+      position: relative;
+    }
+
+    /* Плашка с обновленной плавной анимацией по центру */
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      background: var(--amethyst-subtle);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      color: var(--amethyst-bright);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      outline: none;
+      user-select: none;
+      transform-origin: center;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Маленький светодиод */
+    .header-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--amethyst-bright);
+      box-shadow: 0 0 8px var(--amethyst-bright);
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Затухание светодиода при клике (выключенное состояние) */
+    .header-badge.disabled::before {
+      opacity: 0.2;
+      background: var(--text-dim);
+      box-shadow: none;
+    }
+
+    .header-badge:hover {
+      border-color: var(--amethyst-bright);
+      box-shadow: 0 0 15px var(--amethyst-glow);
+      transform: scale(1.015);
+    }
+
+    .header-badge:active {
+      transform: scale(0.99);
     }
 
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      color: var(--accent);
-      margin-bottom: 0.2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, var(--amethyst-bright) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
     }
 
     .subtitle {
-      font-size: 1.25rem;
-      color: var(--purple);
+      font-size: 1.2rem;
+      color: var(--amethyst-bright);
       font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 1.5rem;
     }
 
     .bio {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 2.5rem;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bio::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--amethyst), transparent);
     }
 
     .bio p {
-      margin-bottom: 1rem;
-      color: #d1d5db;
+      margin-bottom: 1.2rem;
+      color: #e2e8f0;
+      font-size: 1.05rem;
     }
 
     .bio p:last-child {
@@ -80,58 +180,92 @@
     }
 
     .skills-tag {
-      display: inline-block;
-      background: rgba(138, 92, 246, 0.2);
-      color: var(--accent);
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      display: inline;
+      background: none;
+      border: none;
+      color: var(--amethyst-bright);
+      font-weight: 600;
+      padding: 0 0.2rem;
     }
 
-    /* Section Headings */
     h2 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 2rem;
+      font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.5rem;
+      margin: 3.5rem 0 1.75rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
-    /* Flex Video Grid */
+    h2::before {
+      content: "";
+      width: 4px;
+      height: 1.5rem;
+      background: var(--amethyst);
+      border-radius: 2px;
+      box-shadow: 0 0 12px var(--amethyst);
+    }
+
     .video-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+      perspective: 1000px;
     }
 
     .video-card {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
       overflow: hidden;
-      flex: 0 0 calc(33.3333% - 1rem);
-      min-width: 250px;
       cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .video-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--purple);
-      filter: drop-shadow(0 0 8px var(--purple));
+      border-color: var(--card-border-hover);
+      box-shadow: 0 20px 40px -15px var(--amethyst-glow);
+    }
+
+    .card-glare {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(
+        500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(192, 132, 252, 0.08),
+        transparent 60%
+      );
+      z-index: 3;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .video-card:hover .card-glare {
+      opacity: 1;
     }
 
     .thumbnail-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      padding-top: 56.25%;
       background: #000;
+      overflow: hidden;
+      transform: translateZ(15px);
     }
 
     .thumbnail-wrapper video {
@@ -142,50 +276,66 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
+      transition: transform 0.5s ease;
+    }
+
+    .video-card:hover .thumbnail-wrapper video {
+      transform: scale(1.04);
     }
 
     .card-content {
-      padding: 1.25rem;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+      transform: translateZ(20px);
     }
 
     .card-title {
-      font-size: 1.2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
       font-weight: 600;
-      color: var(--accent);
+      color: #ffffff;
       margin-bottom: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .video-card:hover .card-title {
+      color: var(--amethyst-bright);
     }
 
     .card-desc {
       font-size: 0.95rem;
       color: var(--text-muted);
       flex-grow: 1;
+      margin-bottom: 1rem;
     }
 
     .badge {
       align-self: flex-start;
-      margin-top: 0.75rem;
       font-size: 0.75rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
+      font-weight: 600;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      background: rgba(157, 78, 221, 0.15);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      color: var(--amethyst-bright);
     }
 
     .badge.legacy {
-      background: rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
       color: #fca5a5;
     }
 
-    /* Terms Section */
     .terms {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 3rem;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .terms ul {
@@ -194,9 +344,10 @@
 
     .terms li {
       position: relative;
-      padding-left: 1.75rem;
-      margin-bottom: 0.75rem;
+      padding-left: 2rem;
+      margin-bottom: 1rem;
       color: #d1d5db;
+      font-size: 1.05rem;
     }
 
     .terms li:last-child {
@@ -207,7 +358,8 @@
       content: "✦";
       position: absolute;
       left: 0;
-      color: var(--accent);
+      color: var(--amethyst-bright);
+      font-size: 1.1rem;
     }
 
     .highlight {
@@ -215,7 +367,6 @@
       color: #ffffff;
     }
 
-    /* Modal Player (FIXED) */
     .modal {
       display: none;
       position: fixed;
@@ -223,13 +374,14 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(5, 3, 8, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       padding: 20px;
     }
 
@@ -240,16 +392,15 @@
 
     .modal-content {
       background: #000;
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
+      border: 1px solid var(--card-border-hover);
+      border-radius: 24px;
       position: relative;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.9);
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      display: inline-flex;
+      box-shadow: 0 25px 80px rgba(157, 78, 221, 0.25);
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
       max-width: 90vw;
       max-height: 90vh;
-      line-height: 0;
     }
 
     .modal.active .modal-content {
@@ -258,67 +409,78 @@
 
     .modal-content video {
       max-width: 90vw;
-      max-height: 90vh;
+      max-height: 85vh;
       width: auto;
       height: auto;
-      border-radius: 20px;
       display: block;
     }
 
     .close-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(0, 0, 0, 0.6);
+      top: 20px;
+      right: 20px;
+      background: rgba(18, 14, 28, 0.7);
       color: #fff;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 1.5rem;
-      width: 40px;
-      height: 40px;
+      font-size: 1.25rem;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       cursor: pointer;
       z-index: 1001;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
-      line-height: 1;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
     }
 
     .close-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: var(--amethyst);
+      border-color: var(--amethyst-bright);
+      transform: rotate(90deg);
     }
 
-    /* Footer */
     footer {
       text-align: center;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      color: var(--text-muted);
-      font-size: 0.9rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-dim);
+      font-size: 0.95rem;
     }
 
     .social-links {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
 
     .social-links a {
-      color: var(--accent);
+      color: var(--text-main);
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s;
+      font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
     }
 
     .social-links a:hover {
-      color: var(--purple);
+      color: #ffffff;
+      background: var(--amethyst-subtle);
+      border-color: var(--amethyst);
+      box-shadow: 0 0 15px var(--amethyst-glow);
     }
 
     @media (max-width: 640px) {
-      .video-card {
-        flex: 1 1 100%;
+      body {
+        padding: 1.5rem 1rem;
+      }
+      .video-grid {
+        grid-template-columns: 1fr;
       }
       h1 {
         font-size: 2.2rem;
@@ -328,14 +490,20 @@
 </head>
 <body>
 
+  <canvas id="bg-canvas"></canvas>
+
   <div class="container">
     <header>
+      <button id="toggle-repulsion" class="header-badge" type="button" title="Toggle particle physics">
+        Roblox Developer Portfolio
+      </button>
       <h1>Paradoxea</h1>
       <div class="subtitle">Roblox Middle Indie Gamedev</div>
 
       <div class="bio">
         <p>I started learning Roblox Studio back in 2023. Today, I position myself as a <strong>Middle Roblox Developer</strong>, currently developing an ambitious asymmetric horror game.</p>
         <p>Beyond Roblox, I have a foundational understanding of <strong>Python, C#, JS, TS, HTML, and CSS</strong>. While my personal schedule limits total development time, I pride myself on strong engineering logic, efficient system design, and producing clean code.</p>
+        <p><strong>Architecture & Tooling:</strong> <span class="skills-tag">Rojo</span>, <span class="skills-tag">ProfileService</span>, <span class="skills-tag">ReplicaService</span></p>
         <p><strong>English Proficiency:</strong> <span class="skills-tag">B1 - B2</span> (Full professional comprehension of technical specs, solid written communication)</p>
       </div>
     </header>
@@ -343,34 +511,34 @@
     <h2>Projects Showcase</h2>
 
     <div class="video-grid">
-      <!-- Video 1 -->
       <div class="video-card" onclick="openModal('https://files.catbox.moe/j62tvg.mp4')">
+        <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/j62tvg.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="https://files.catbox.moe/j62tvg.mp4#t=0.1" preload="metadata" muted loop></video>
         </div>
         <div class="card-content">
           <div class="card-title">Round & Hitbox Systems</div>
           <div class="card-desc">A fully functional, looping round system and hitboxes on custom rigs that don't kill through walls</div>
-          <span class="badge">Сurrent unfinished project</span>
+          <span class="badge">Current unfinished project</span>
         </div>
       </div>
 
-      <!-- Video 2 -->
       <div class="video-card" onclick="openModal('https://files.catbox.moe/ht6v6w.mp4')">
+        <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/ht6v6w.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="https://files.catbox.moe/ht6v6w.mp4#t=0.1" preload="metadata" muted loop></video>
         </div>
         <div class="card-content">
           <div class="card-title">Inventory system & Admin panel</div>
           <div class="card-desc">An inventory system with minimal server latency and a flexible interface, and a multi-tasking admin panel</div>
-          <span class="badge">Сurrent unfinished project</span>
+          <span class="badge">Current unfinished project</span>
         </div>
       </div>
 
-      <!-- Video 3 (Old project) -->
       <div class="video-card" onclick="openModal('https://files.catbox.moe/7noo9t.mp4')">
+        <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/7noo9t.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="https://files.catbox.moe/7noo9t.mp4#t=0.1" preload="metadata" muted loop></video>
         </div>
         <div class="card-content">
           <div class="card-title">Incremental game mechanics</div>
@@ -379,10 +547,10 @@
         </div>
       </div>
 
-      <!-- Video 4 (Old project) -->
       <div class="video-card" onclick="openModal('https://files.catbox.moe/l9ozic.mp4')">
+        <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/l9ozic.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="https://files.catbox.moe/l9ozic.mp4#t=0.1" preload="metadata" muted loop></video>
         </div>
         <div class="card-content">
           <div class="card-title">Cash grab games development experience</div>
@@ -391,10 +559,10 @@
         </div>
       </div>
 
-      <!-- Video 5 (Old project) -->
       <div class="video-card" onclick="openModal('https://files.catbox.moe/fm6aeq.mp4')">
+        <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
-          <video src="https://files.catbox.moe/fm6aeq.mp4#t=0.1" preload="metadata" muted></video>
+          <video src="https://files.catbox.moe/fm6aeq.mp4#t=0.1" preload="metadata" muted loop></video>
         </div>
         <div class="card-content">
           <div class="card-title">First Tycoon development expirience</div>
@@ -418,11 +586,10 @@
         <a href="https://discord.com/users/613829528296357901" target="_blank">Discord</a>
         <a href="https://www.roblox.com/users/1031928753/profile" target="_blank">Roblox Profile</a>
       </div>
-      <p>© 2026 Most likely all rights reserved.</p>
+      <p>© 2026 Paradoxea. all rights maybe reserved.</p>
     </footer>
   </div>
 
-  <!-- Modal Player -->
   <div class="modal" id="videoModal" onclick="closeModal(event)">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal(event, true)">&times;</button>
@@ -431,6 +598,193 @@
   </div>
 
   <script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    let mouseX = -1000;
+    let mouseY = -1000;
+    let mouseInWindow = false;
+    let glowAlpha = 0;
+
+    let repulsionEnabled = true;
+    let isMouseMoving = false;
+    let mouseStopTimer = null;
+
+    // Переключатель физики частиц + затухание светодиода
+    const toggleBtn = document.getElementById('toggle-repulsion');
+    toggleBtn.addEventListener('click', () => {
+      repulsionEnabled = !repulsionEnabled;
+      toggleBtn.classList.toggle('disabled', !repulsionEnabled);
+    });
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+
+    class SpaceStar {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 1.6 + 0.5;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 0.15 + 0.03;
+        this.baseVx = Math.cos(angle) * speed;
+        this.baseVy = Math.sin(angle) * speed;
+
+        this.ix = 0;
+        this.iy = 0;
+        
+        this.baseAlpha = Math.random() * 0.45 + 0.15;
+        this.twinkleAngle = Math.random() * Math.PI * 2;
+        this.twinkleSpeed = Math.random() * 0.015 + 0.005;
+        this.currentAlpha = this.baseAlpha;
+      }
+
+      update() {
+        if (repulsionEnabled && mouseInWindow && isMouseMoving) {
+          const dx = this.x - mouseX;
+          const dy = this.y - mouseY;
+          const dist = Math.hypot(dx, dy);
+          const radius = 140;
+
+          if (dist < radius && dist > 0) {
+            const force = Math.pow(1 - dist / radius, 2) * 0.75;
+            this.ix += (dx / dist) * force;
+            this.iy += (dy / dist) * force;
+          }
+        }
+
+        this.ix *= 0.88;
+        this.iy *= 0.88;
+
+        this.x += this.baseVx + this.ix;
+        this.y += this.baseVy + this.iy;
+
+        this.twinkleAngle += this.twinkleSpeed;
+        const impulseMag = Math.hypot(this.ix, this.iy);
+        
+        this.currentAlpha = this.baseAlpha + Math.sin(this.twinkleAngle) * 0.22 + impulseMag * 0.12;
+        this.currentAlpha = Math.max(0.08, Math.min(0.85, this.currentAlpha));
+
+        if (this.x < -10) this.x = width + 10;
+        if (this.x > width + 10) this.x = -10;
+        if (this.y < -10) this.y = height + 10;
+        if (this.y > height + 10) this.y = -10;
+      }
+
+      draw() {
+        ctx.fillStyle = `rgba(192, 132, 252, ${this.currentAlpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((width * height) / 4000);
+      for (let i = 0; i < count; i++) {
+        particles.push(new SpaceStar());
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseInWindow = true;
+      isMouseMoving = true;
+
+      clearTimeout(mouseStopTimer);
+      mouseStopTimer = setTimeout(() => {
+        isMouseMoving = false;
+      }, 100);
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouseInWindow = false;
+      isMouseMoving = false;
+    });
+
+    function renderCanvas() {
+      ctx.clearRect(0, 0, width, height);
+
+      glowAlpha += ((mouseInWindow ? 1 : 0) - glowAlpha) * 0.05;
+
+      if (glowAlpha > 0.001) {
+        const gradient = ctx.createRadialGradient(
+          mouseX, mouseY, 0,
+          mouseX, mouseY, 320
+        );
+        gradient.addColorStop(0, `rgba(157, 78, 221, ${0.12 * glowAlpha})`);
+        gradient.addColorStop(0.5, `rgba(124, 58, 237, ${0.03 * glowAlpha})`);
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(renderCanvas);
+    }
+
+    resizeCanvas();
+    renderCanvas();
+
+    // 3D Карточки и модалка
+    const cards = document.querySelectorAll('.video-card');
+
+    cards.forEach(card => {
+      const video = card.querySelector('video');
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const normX = (y - centerY) / centerY;
+        const normY = (x - centerX) / centerX;
+
+        const rotateX = -normX * 5.5;
+        const rotateY = normY * 5.5;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`;
+        
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      card.addEventListener('mouseenter', () => {
+        if (video) video.play();
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        if (video) {
+          video.pause();
+          video.currentTime = 0.1;
+        }
+      });
+    });
+
     const modal = document.getElementById('videoModal');
     const modalVideo = document.getElementById('modalVideo');
 
