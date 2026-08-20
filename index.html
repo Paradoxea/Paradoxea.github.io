@@ -573,7 +573,7 @@
     <h2>Terms of Service</h2>
     <div class="terms">
       <ul>
-        <li>All active development and feature showcases are hosted in my <span class="highlight">Demo Place</span>. You test everything personally before making a payment. Or I can work where you want for an advance payment</li>
+        <li>All active development and showcases are hosted in my <span class="highlight">Demo Place</span> so you can test everything before payment. Working directly in your place requires an upfront payment or individually agreed terms.</li>
         <li>Payments accepted via fiat (<span class="highlight">USD / UAH</span>) to card, Crypto, or PayPal. <span class="highlight">No Robux</span>.</li>
         <li>Upon full payment, you will receive clean, organized source code along with complete migration assistance to your main place.</li>
       </ul>
@@ -698,7 +698,6 @@
       }
     }
 
-    // Обработка движения указателя (мышь / палец)
     window.addEventListener('pointermove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
@@ -752,14 +751,12 @@
     resizeCanvas();
     renderCanvas();
 
-    // Логика карточек для ПК и мобильных устройств
     const cards = document.querySelectorAll('.video-card');
 
     cards.forEach(card => {
       const video = card.querySelector('video');
       const videoSrc = card.getAttribute('data-video');
 
-      // Наведение мыши (Desktop)
       card.addEventListener('pointerenter', (e) => {
         if (e.pointerType === 'mouse' && video) {
           video.play().catch(() => {});
@@ -801,15 +798,11 @@
         }
       });
 
-      // Тапы (Mobile / Touch)
       card.addEventListener('click', (e) => {
-        // Если это тач-устройство (или клик пальцем)
         if (e.pointerType === 'touch' || !window.matchMedia('(pointer: fine)').matches) {
           if (!card.classList.contains('touch-active')) {
-            // Первый тап: активируем карточку, запускаем видео и подсветку
             e.preventDefault();
             
-            // Сбрасываем остальные карточки
             cards.forEach(c => {
               if (c !== card) {
                 c.classList.remove('touch-active');
@@ -825,17 +818,15 @@
             card.style.setProperty('--mouse-y', `${rect.height / 2}px`);
             if (video) video.play().catch(() => {});
           } else {
-            // Второй тап по уже активной карточке: открываем модалку
             openModal(videoSrc);
           }
         } else {
-          // Для ПК клик сразу открывает модалку
           openModal(videoSrc);
         }
       });
     });
 
-    // Клик мимо карточек на мобилках сбрасывает их активность
+  
     document.addEventListener('pointerdown', (e) => {
       if (!e.target.closest('.video-card')) {
         cards.forEach(card => {
