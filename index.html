@@ -509,7 +509,7 @@
     <h2>Projects Showcase</h2>
 
     <div class="video-grid">
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/j62tvg.mp4')">
+      <div class="video-card" data-video="https://files.catbox.moe/j62tvg.mp4">
         <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
           <video src="https://files.catbox.moe/j62tvg.mp4#t=0.1" preload="metadata" muted loop></video>
@@ -521,7 +521,7 @@
         </div>
       </div>
 
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/ht6v6w.mp4')">
+      <div class="video-card" data-video="https://files.catbox.moe/ht6v6w.mp4">
         <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
           <video src="https://files.catbox.moe/ht6v6w.mp4#t=0.1" preload="metadata" muted loop></video>
@@ -533,7 +533,7 @@
         </div>
       </div>
 
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/7noo9t.mp4')">
+      <div class="video-card" data-video="https://files.catbox.moe/7noo9t.mp4">
         <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
           <video src="https://files.catbox.moe/7noo9t.mp4#t=0.1" preload="metadata" muted loop></video>
@@ -545,7 +545,7 @@
         </div>
       </div>
 
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/l9ozic.mp4')">
+      <div class="video-card" data-video="https://files.catbox.moe/l9ozic.mp4">
         <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
           <video src="https://files.catbox.moe/l9ozic.mp4#t=0.1" preload="metadata" muted loop></video>
@@ -557,7 +557,7 @@
         </div>
       </div>
 
-      <div class="video-card" onclick="openModal('https://files.catbox.moe/fm6aeq.mp4')">
+      <div class="video-card" data-video="https://files.catbox.moe/fm6aeq.mp4">
         <div class="card-glare"></div>
         <div class="thumbnail-wrapper">
           <video src="https://files.catbox.moe/fm6aeq.mp4#t=0.1" preload="metadata" muted loop></video>
@@ -698,51 +698,30 @@
       }
     }
 
-    function updatePointer(clientX, clientY, pointerId) {
-      if (activePointerId !== null && pointerId !== activePointerId) return;
-      if (activePointerId === null) activePointerId = pointerId;
-
-      mouseX = clientX;
-      mouseY = clientY;
+    // Обработка движения указателя (мышь / палец)
+    window.addEventListener('pointermove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
       mouseInWindow = true;
       isMouseMoving = true;
 
       clearTimeout(mouseStopTimer);
       mouseStopTimer = setTimeout(() => {
         isMouseMoving = false;
-      }, 100);
-    }
-
-    window.addEventListener('pointermove', (e) => {
-      updatePointer(e.clientX, e.clientY, e.pointerId);
+      }, 150);
     }, { passive: true });
 
-    window.addEventListener('pointerdown', (e) => {
-      updatePointer(e.clientX, e.clientY, e.pointerId);
-    }, { passive: true });
-
-    window.addEventListener('pointerup', (e) => {
-      if (e.pointerId === activePointerId) {
-        activePointerId = null;
-      }
+    window.addEventListener('pointerleave', () => {
+      mouseInWindow = false;
+      isMouseMoving = false;
     });
 
-    window.addEventListener('pointercancel', (e) => {
-      if (e.pointerId === activePointerId) {
-        activePointerId = null;
-      }
-    });
-
-    const clearMouseState = () => {
-      activePointerId = null;
+    window.addEventListener('blur', () => {
       mouseInWindow = false;
       isMouseMoving = false;
       mouseX = -1000;
       mouseY = -1000;
-    };
-
-    window.addEventListener('blur', clearMouseState);
-    document.addEventListener('mouseleave', clearMouseState);
+    });
 
     function renderCanvas() {
       ctx.clearRect(0, 0, width, height);
@@ -773,25 +752,24 @@
     resizeCanvas();
     renderCanvas();
 
+    // Логика карточек для ПК и мобильных устройств
     const cards = document.querySelectorAll('.video-card');
 
     cards.forEach(card => {
       const video = card.querySelector('video');
-      let cardPointerId = null;
+      const videoSrc = card.getAttribute('data-video');
 
-      function handleCardMove(clientX, clientY, pointerId) {
-        if (cardPointerId !== null && pointerId !== cardPointerId) return;
-        if (cardPointerId === null) {
-          cardPointerId = pointerId;
-          card.classList.add('touch-active');
-          if (video) {
-            video.play().catch(() => {});
-          }
+      // Наведение мыши (Desktop)
+      card.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse' && video) {
+          video.play().catch(() => {});
         }
+      });
 
+      card.addEventListener('pointermove', (e) => {
         const rect = card.getBoundingClientRect();
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
@@ -806,54 +784,70 @@
         
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
-      }
 
-      card.addEventListener('pointerdown', (e) => {
-        handleCardMove(e.clientX, e.clientY, e.pointerId);
-      });
-
-      card.addEventListener('pointermove', (e) => {
-        if (cardPointerId !== null) {
-          handleCardMove(e.clientX, e.clientY, e.pointerId);
-        } else if (e.pointerType === 'mouse') {
-          handleCardMove(e.clientX, e.clientY, e.pointerId);
+        if (e.pointerType === 'mouse' && video && video.paused) {
+          video.play().catch(() => {});
         }
       }, { passive: true });
 
-      card.addEventListener('pointerenter', (e) => {
-        if (e.pointerType === 'mouse' && video) {
-          video.play().catch(() => {});
-        }
-      });
-
       card.addEventListener('pointerleave', (e) => {
-        if (cardPointerId === null || e.pointerId === cardPointerId || e.pointerType === 'mouse') {
-          if (cardPointerId === e.pointerId) cardPointerId = null;
+        if (e.pointerType === 'mouse') {
           card.classList.remove('touch-active');
           card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-          
-          if (video && e.pointerType === 'mouse') {
+          if (video) {
             video.pause();
             video.currentTime = 0.1;
           }
         }
       });
 
-      card.addEventListener('pointerup', (e) => {
-        if (e.pointerId === cardPointerId) {
-          cardPointerId = null;
-          card.classList.remove('touch-active');
-          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-        }
-      });
+      // Тапы (Mobile / Touch)
+      card.addEventListener('click', (e) => {
+        // Если это тач-устройство (или клик пальцем)
+        if (e.pointerType === 'touch' || !window.matchMedia('(pointer: fine)').matches) {
+          if (!card.classList.contains('touch-active')) {
+            // Первый тап: активируем карточку, запускаем видео и подсветку
+            e.preventDefault();
+            
+            // Сбрасываем остальные карточки
+            cards.forEach(c => {
+              if (c !== card) {
+                c.classList.remove('touch-active');
+                c.style.transform = 'none';
+                const v = c.querySelector('video');
+                if (v) { v.pause(); v.currentTime = 0.1; }
+              }
+            });
 
-      card.addEventListener('pointercancel', (e) => {
-        if (e.pointerId === cardPointerId) {
-          cardPointerId = null;
-          card.classList.remove('touch-active');
-          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            card.classList.add('touch-active');
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', `${rect.width / 2}px`);
+            card.style.setProperty('--mouse-y', `${rect.height / 2}px`);
+            if (video) video.play().catch(() => {});
+          } else {
+            // Второй тап по уже активной карточке: открываем модалку
+            openModal(videoSrc);
+          }
+        } else {
+          // Для ПК клик сразу открывает модалку
+          openModal(videoSrc);
         }
       });
+    });
+
+    // Клик мимо карточек на мобилках сбрасывает их активность
+    document.addEventListener('pointerdown', (e) => {
+      if (!e.target.closest('.video-card')) {
+        cards.forEach(card => {
+          card.classList.remove('touch-active');
+          card.style.transform = 'none';
+          const video = card.querySelector('video');
+          if (video) {
+            video.pause();
+            video.currentTime = 0.1;
+          }
+        });
+      }
     });
 
     const modal = document.getElementById('videoModal');
