@@ -226,7 +226,7 @@
       position: relative;
       transform-style: preserve-3d;
       will-change: transform;
-      touch-action: pan-y; /* Разрешает вертикальный скролл страницы пальцем, не блокируя жесты */
+      touch-action: pan-y;
       transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -698,13 +698,12 @@
       }
     }
 
-    // Обработка глобального движения указателя (палец или мышь) с защитой от мультитача
-    window.addEventListener('pointermove', (e) => {
-      if (activePointerId !== null && e.pointerId !== activePointerId) return;
-      if (activePointerId === null) activePointerId = e.pointerId;
+    function updatePointer(clientX, clientY, pointerId) {
+      if (activePointerId !== null && pointerId !== activePointerId) return;
+      if (activePointerId === null) activePointerId = pointerId;
 
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouseX = clientX;
+      mouseY = clientY;
       mouseInWindow = true;
       isMouseMoving = true;
 
@@ -712,6 +711,14 @@
       mouseStopTimer = setTimeout(() => {
         isMouseMoving = false;
       }, 100);
+    }
+
+    window.addEventListener('pointermove', (e) => {
+      updatePointer(e.clientX, e.clientY, e.pointerId);
+    }, { passive: true });
+
+    window.addEventListener('pointerdown', (e) => {
+      updatePointer(e.clientX, e.clientY, e.pointerId);
     }, { passive: true });
 
     window.addEventListener('pointerup', (e) => {
@@ -766,29 +773,25 @@
     resizeCanvas();
     renderCanvas();
 
-    // 3D Карточки с полной поддержкой перемещения пальца и защитой от хаоса при мультитаче
     const cards = document.querySelectorAll('.video-card');
 
     cards.forEach(card => {
       const video = card.querySelector('video');
       let cardPointerId = null;
 
-      card.addEventListener('pointerdown', (e) => {
-        if (cardPointerId !== null) return; // Игнорируем второй палец, если один уже взаимодействует с карточкой
-        cardPointerId = e.pointerId;
-        card.classList.add('touch-active');
-
-        if (video) {
-          video.play().catch(() => {});
+      function handleCardMove(clientX, clientY, pointerId) {
+        if (cardPointerId !== null && pointerId !== cardPointerId) return;
+        if (cardPointerId === null) {
+          cardPointerId = pointerId;
+          card.classList.add('touch-active');
+          if (video) {
+            video.play().catch(() => {});
+          }
         }
-      });
-
-      card.addEventListener('pointermove', (e) => {
-        if (cardPointerId !== null && e.pointerId !== cardPointerId) return;
 
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
@@ -803,9 +806,17 @@
         
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
+      }
 
-        if (e.pointerType === 'mouse' && video && video.paused) {
-          video.play().catch(() => {});
+      card.addEventListener('pointerdown', (e) => {
+        handleCardMove(e.clientX, e.clientY, e.pointerId);
+      });
+
+      card.addEventListener('pointermove', (e) => {
+        if (cardPointerId !== null) {
+          handleCardMove(e.clientX, e.clientY, e.pointerId);
+        } else if (e.pointerType === 'mouse') {
+          handleCardMove(e.clientX, e.clientY, e.pointerId);
         }
       }, { passive: true });
 
