@@ -226,10 +226,11 @@
       position: relative;
       transform-style: preserve-3d;
       will-change: transform;
+      touch-action: pan-y; /* Разрешает вертикальный скролл страницы пальцем, не блокируя жесты */
       transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .video-card:hover {
+    .video-card:hover, .video-card.touch-active {
       border-color: var(--card-border-hover);
       box-shadow: 0 20px 40px -15px var(--amethyst-glow);
     }
@@ -252,7 +253,7 @@
       transition: opacity 0.4s ease;
     }
 
-    .video-card:hover .card-glare {
+    .video-card:hover .card-glare, .video-card.touch-active .card-glare {
       opacity: 1;
     }
 
@@ -276,7 +277,7 @@
       transition: transform 0.5s ease;
     }
 
-    .video-card:hover .thumbnail-wrapper video {
+    .video-card:hover .thumbnail-wrapper video, .video-card.touch-active .thumbnail-wrapper video {
       transform: scale(1.04);
     }
 
@@ -297,7 +298,7 @@
       transition: color 0.2s;
     }
 
-    .video-card:hover .card-title {
+    .video-card:hover .card-title, .video-card.touch-active .card-title {
       color: var(--amethyst-bright);
     }
 
@@ -697,7 +698,7 @@
       }
     }
 
-    // Универсальные Pointer Events: работают и с пальцем, и с мышкой, исключая конфликты мультитача
+    // Обработка глобального движения указателя (палец или мышь) с защитой от мультитача
     window.addEventListener('pointermove', (e) => {
       if (activePointerId !== null && e.pointerId !== activePointerId) return;
       if (activePointerId === null) activePointerId = e.pointerId;
@@ -711,7 +712,7 @@
       mouseStopTimer = setTimeout(() => {
         isMouseMoving = false;
       }, 100);
-    });
+    }, { passive: true });
 
     window.addEventListener('pointerup', (e) => {
       if (e.pointerId === activePointerId) {
@@ -719,7 +720,12 @@
       }
     });
 
-    // Надежный сброс при уходе курсора за пределы окна браузера или смене вкладки
+    window.addEventListener('pointercancel', (e) => {
+      if (e.pointerId === activePointerId) {
+        activePointerId = null;
+      }
+    });
+
     const clearMouseState = () => {
       activePointerId = null;
       mouseInWindow = false;
@@ -760,16 +766,25 @@
     resizeCanvas();
     renderCanvas();
 
-    // 3D Карточки с поддержкой тач-жестов без ломания скролла двумя пальцами
+    // 3D Карточки с полной поддержкой перемещения пальца и защитой от хаоса при мультитаче
     const cards = document.querySelectorAll('.video-card');
 
     cards.forEach(card => {
       const video = card.querySelector('video');
       let cardPointerId = null;
 
+      card.addEventListener('pointerdown', (e) => {
+        if (cardPointerId !== null) return; // Игнорируем второй палец, если один уже взаимодействует с карточкой
+        cardPointerId = e.pointerId;
+        card.classList.add('touch-active');
+
+        if (video) {
+          video.play().catch(() => {});
+        }
+      });
+
       card.addEventListener('pointermove', (e) => {
         if (cardPointerId !== null && e.pointerId !== cardPointerId) return;
-        if (cardPointerId === null) cardPointerId = e.pointerId;
 
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -790,20 +805,22 @@
         card.style.setProperty('--mouse-y', `${y}px`);
 
         if (e.pointerType === 'mouse' && video && video.paused) {
-          video.play();
+          video.play().catch(() => {});
         }
-      });
+      }, { passive: true });
 
       card.addEventListener('pointerenter', (e) => {
         if (e.pointerType === 'mouse' && video) {
-          video.play();
+          video.play().catch(() => {});
         }
       });
 
       card.addEventListener('pointerleave', (e) => {
-        if (cardPointerId === e.pointerId || e.pointerType === 'mouse') {
-          cardPointerId = null;
+        if (cardPointerId === null || e.pointerId === cardPointerId || e.pointerType === 'mouse') {
+          if (cardPointerId === e.pointerId) cardPointerId = null;
+          card.classList.remove('touch-active');
           card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+          
           if (video && e.pointerType === 'mouse') {
             video.pause();
             video.currentTime = 0.1;
@@ -814,6 +831,16 @@
       card.addEventListener('pointerup', (e) => {
         if (e.pointerId === cardPointerId) {
           cardPointerId = null;
+          card.classList.remove('touch-active');
+          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        }
+      });
+
+      card.addEventListener('pointercancel', (e) => {
+        if (e.pointerId === cardPointerId) {
+          cardPointerId = null;
+          card.classList.remove('touch-active');
+          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
         }
       });
     });
