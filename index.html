@@ -70,7 +70,6 @@
       position: relative;
     }
 
-    /* Плашка с обновленной плавной анимацией по центру */
     .header-badge {
       display: inline-flex;
       align-items: center;
@@ -96,7 +95,6 @@
                   border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Маленький светодиод */
     .header-badge::before {
       content: "";
       width: 6px;
@@ -109,7 +107,6 @@
                   box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Затухание светодиода при клике (выключенное состояние) */
     .header-badge.disabled::before {
       opacity: 0.2;
       background: var(--text-dim);
@@ -604,6 +601,7 @@
     let width, height;
     let particles = [];
     
+    let activePointerId = null;
     let mouseX = -1000;
     let mouseY = -1000;
     let mouseInWindow = false;
@@ -613,7 +611,6 @@
     let isMouseMoving = false;
     let mouseStopTimer = null;
 
-    // Переключатель физики частиц + затухание светодиода
     const toggleBtn = document.getElementById('toggle-repulsion');
     toggleBtn.addEventListener('click', () => {
       repulsionEnabled = !repulsionEnabled;
@@ -700,7 +697,11 @@
       }
     }
 
-    window.addEventListener('mousemove', (e) => {
+    // Универсальные Pointer Events: работают и с пальцем, и с мышкой, исключая конфликты мультитача
+    window.addEventListener('pointermove', (e) => {
+      if (activePointerId !== null && e.pointerId !== activePointerId) return;
+      if (activePointerId === null) activePointerId = e.pointerId;
+
       mouseX = e.clientX;
       mouseY = e.clientY;
       mouseInWindow = true;
@@ -712,10 +713,23 @@
       }, 100);
     });
 
-    window.addEventListener('mouseleave', () => {
+    window.addEventListener('pointerup', (e) => {
+      if (e.pointerId === activePointerId) {
+        activePointerId = null;
+      }
+    });
+
+    // Надежный сброс при уходе курсора за пределы окна браузера или смене вкладки
+    const clearMouseState = () => {
+      activePointerId = null;
       mouseInWindow = false;
       isMouseMoving = false;
-    });
+      mouseX = -1000;
+      mouseY = -1000;
+    };
+
+    window.addEventListener('blur', clearMouseState);
+    document.addEventListener('mouseleave', clearMouseState);
 
     function renderCanvas() {
       ctx.clearRect(0, 0, width, height);
@@ -746,13 +760,17 @@
     resizeCanvas();
     renderCanvas();
 
-    // 3D Карточки и модалка
+    // 3D Карточки с поддержкой тач-жестов без ломания скролла двумя пальцами
     const cards = document.querySelectorAll('.video-card');
 
     cards.forEach(card => {
       const video = card.querySelector('video');
+      let cardPointerId = null;
 
-      card.addEventListener('mousemove', (e) => {
+      card.addEventListener('pointermove', (e) => {
+        if (cardPointerId !== null && e.pointerId !== cardPointerId) return;
+        if (cardPointerId === null) cardPointerId = e.pointerId;
+
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -770,17 +788,32 @@
         
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
+
+        if (e.pointerType === 'mouse' && video && video.paused) {
+          video.play();
+        }
       });
 
-      card.addEventListener('mouseenter', () => {
-        if (video) video.play();
+      card.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse' && video) {
+          video.play();
+        }
       });
 
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-        if (video) {
-          video.pause();
-          video.currentTime = 0.1;
+      card.addEventListener('pointerleave', (e) => {
+        if (cardPointerId === e.pointerId || e.pointerType === 'mouse') {
+          cardPointerId = null;
+          card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+          if (video && e.pointerType === 'mouse') {
+            video.pause();
+            video.currentTime = 0.1;
+          }
+        }
+      });
+
+      card.addEventListener('pointerup', (e) => {
+        if (e.pointerId === cardPointerId) {
+          cardPointerId = null;
         }
       });
     });
